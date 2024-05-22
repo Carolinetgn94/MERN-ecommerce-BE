@@ -3,7 +3,6 @@ const cors = require('cors');
 const ErrorHandler = require('./utilities/ErrorHandler');
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const fileUpload = require("express-fileupload");
 require('dotenv').config();
 require('./config/database')
 
@@ -11,8 +10,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use("/", express.static("assets"));
 app.use(bodyParser.urlencoded({extended: true, limit:"50mb"}));
-app.use(fileUpload({useTempFiles: true}));
+
+const userRoute = require("./routes/user.routes");
+
+app.use("/api/user", userRoute)
+
 app.use(ErrorHandler);
 
 
