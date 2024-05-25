@@ -9,7 +9,7 @@ require('./config/database')
 const app = express();
 app.use(cors({
     origin: 'http://localhost:3000',
-    credentials: true
+    credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
