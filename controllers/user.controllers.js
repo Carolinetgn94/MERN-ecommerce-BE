@@ -81,7 +81,26 @@ async function loginUser(req, res, next) {
   }
 }
 
+async function getUser (req, res, next) {
+  try { 
+    const user = await User.findById(req.user.id)
+
+    if (!user) {
+      return next(new ErrorHandler("User does not exist", 400));
+    }
+    res.status(200).json({
+      sucess: true,
+      user,
+    });
+  } catch (err) {
+    return next(new ErrorHandler(err.message, 500));
+  }
+}
+
+
+
 module.exports = {
   createUser,
   loginUser,
+  getUser,
 };
