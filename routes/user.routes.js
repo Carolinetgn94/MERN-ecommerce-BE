@@ -5,7 +5,7 @@ const upload = require("../multer")
 const catchAsyncError = require("../middleware/catchAsyncError");
 const {isAuthenticated} = require("../middleware/auth");
 
-router.post('/create-user', upload.single('avatar'), userCtrl.createUser);
+router.post('/create-user', upload.single("file"), userCtrl.createUser);
 
 router.post('/login-user', catchAsyncError(userCtrl.loginUser));
 

@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 require("./config/database");
 
+
 const app = express();
 app.use(
   cors({
@@ -15,10 +16,12 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use("/", express.static("assets"));
+app.use("/", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
+
 const userRoute = require("./routes/user.routes");
+
 
 app.use("/api/user", userRoute);
 
