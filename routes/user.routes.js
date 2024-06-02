@@ -11,4 +11,6 @@ router.post('/login-user', catchAsyncError(userCtrl.loginUser));
 
 router.get('/getuser', isAuthenticated, catchAsyncError(userCtrl.getUser));
 
+router.get('/logout', catchAsyncError(userCtrl.logoutUser))
+
 module.exports = router;
