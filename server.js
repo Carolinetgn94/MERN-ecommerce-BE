@@ -25,6 +25,7 @@ const userRoute = require("./routes/user.routes");
 
 app.use("/api/user", userRoute);
 
+
 app.use(ErrorHandler);
 
 const PORT = 4000;
