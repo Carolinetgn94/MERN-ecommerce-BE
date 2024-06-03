@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const shopSchema = new mongoose.Schema({
   name: {
@@ -27,7 +28,7 @@ const shopSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  zipCode: {
+  postalCode: {
     type: Number,
     required: true,
   },
@@ -46,6 +47,22 @@ const shopSchema = new mongoose.Schema({
   }
 });
 
+shopSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) {
+      next();
+    }
+    this.password = await bcrypt.hash(this.password, 10);
+  });
+
+  shopSchema.methods.getJwtToken = function () {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: process.env.JWT_EXPIRES,
+    });
+  };
+
+  shopSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
 
 
 module.exports = mongoose.model("Shop", shopSchema);

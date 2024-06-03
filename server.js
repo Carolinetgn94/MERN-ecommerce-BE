@@ -21,9 +21,10 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 
 const userRoute = require("./routes/user.routes");
-
+const shopRoute = require("./routes/shop.routes");
 
 app.use("/api/user", userRoute);
+app.use("/api/shop", shopRoute)
 
 
 app.use(ErrorHandler);
