@@ -1,9 +1,9 @@
 const ErrorHandler = require("../utilities/ErrorHandler");
 const cloudinary = require("cloudinary");
 const path = require("path");
-const sendToken = require("../utilities/jwtToken");
 const fs = require("fs");
-const Shop = require("../models/shop.models")
+const Shop = require("../models/shop.models");
+const sendShopToken = require("../utilities/shopToken");
 
 async function createShop (req, res, next) {
     try {
@@ -48,8 +48,48 @@ async function createShop (req, res, next) {
     }
 }
 
+async function loginShop(req, res, next) {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return next(
+          new ErrorHandler("Please input correct email or password", 400)
+        );
+      }
+      const user = await Shop.findOne({ email }).select("+password");
+      if (!user) {
+        return next(new ErrorHandler("User doesn't exist", 400));
+      }
+      const isPasswordValid = await user.comparePassword(password);
+  
+      if (!isPasswordValid) {
+        return next(new ErrorHandler("Incorrect Password", 400));
+      }
+      sendShopToken(user, 201, res);
+    } catch (err) {
+      return next(new ErrorHandler(err.message, 500));
+    }
+  }
+
+  async function getShop (req, res, next) {
+    try { 
+      const seller = await Shop.findById(req.seller._id)
+  
+      if (!seller) {
+        return next(new ErrorHandler("Seller does not exist", 400));
+      }
+      res.status(200).json({
+        sucess: true,
+        seller,
+      });
+    } catch (err) {
+      return next(new ErrorHandler(err.message, 500));
+    }
+  }
+
 
 module.exports = {
     createShop,
-
+    loginShop,
+    getShop,
 }
