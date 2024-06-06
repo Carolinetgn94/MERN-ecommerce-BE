@@ -27,6 +27,23 @@ async function createProduct(req, res, next) {
   }
 }
 
+
+async function getAllShopProducts(req, res, next) {
+    try {
+        const products = await Product.find({shopId: req.params.id});
+
+        res.status(201).json({
+            success: true,
+            products,
+        })
+
+    } catch (err) {
+        return next(new ErrorHandler(err.message, 400));
+      }
+}
+
+
 module.exports = {
   createProduct,
+  getAllShopProducts,
 };
