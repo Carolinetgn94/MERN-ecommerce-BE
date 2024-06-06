@@ -43,7 +43,28 @@ async function getAllShopProducts(req, res, next) {
 }
 
 
+async function deleteShopProduct(req, res, next) {
+    try {
+        const productId = req.params.id;
+        
+        const product = await Product.findByIdAndDelete(productId);
+
+        if (!product) {
+            return next(new ErrorHandler("Product is not found with this id", 404));
+          }   
+          
+          res.status(201).json({
+            success: true,
+            product,
+          });
+
+    } catch (err) {
+        return next(new ErrorHandler(err.message, 400));
+    }
+}
+
 module.exports = {
   createProduct,
   getAllShopProducts,
-};
+  deleteShopProduct,
+}
