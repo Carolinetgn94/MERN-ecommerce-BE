@@ -12,4 +12,7 @@ router.get('/get-all-products-shop/:id', catchAsyncError(productCtrl.getAllShopP
 
 router.delete('/delete-shop-product/:id', isSeller, catchAsyncError(productCtrl.deleteShopProduct));
 
+router.get('/get-all-products', catchAsyncError(productCtrl.getAllProducts));
+
+
 module.exports = router;

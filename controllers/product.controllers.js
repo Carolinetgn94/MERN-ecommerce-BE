@@ -1,6 +1,7 @@
 const Product = require("../models/product.models");
 const Shop = require("../models/shop.models");
 const ErrorHandler = require("../utilities/ErrorHandler");
+const fs = require ("fs");
 
 async function createProduct(req, res, next) {
   try {
@@ -47,7 +48,20 @@ async function deleteShopProduct(req, res, next) {
     try {
         const productId = req.params.id;
         
-        const product = await Product.findByIdAndDelete(productId);
+        const productData = await Product.findById(productId);
+
+        productData.images.forEach((imageUrl) => {
+            const filename = imageUrl;
+            const filePath = `uploads/${filename}`;
+
+            fs.unlink(filePath, (err) => {
+                if(err) {
+                    console.log(err);
+                }
+            })
+        });
+
+        const product = await Product.findByIdAndDelete(productId)
 
         if (!product) {
             return next(new ErrorHandler("Product is not found with this id", 404));
@@ -63,8 +77,23 @@ async function deleteShopProduct(req, res, next) {
     }
 }
 
+async function getAllProducts(req, res, next) {
+    try {
+        const products = await Product.find().sort({ createdAt: -1 });
+  
+        res.status(201).json({
+          success: true,
+          products,
+        });
+      } catch (error) {
+        return next(new ErrorHandler(error, 400));
+      }
+
+}
+
 module.exports = {
   createProduct,
   getAllShopProducts,
   deleteShopProduct,
+  getAllProducts,
 }
