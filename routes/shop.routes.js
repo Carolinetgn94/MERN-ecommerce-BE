@@ -11,4 +11,6 @@ router.post('/login-shop', catchAsyncError(shopCtrl.loginShop));
 
 router.get('/getshop', isSeller, catchAsyncError(shopCtrl.getShop));
 
+router.get('/logout', catchAsyncError(shopCtrl.logoutShop))
+
 module.exports = router;

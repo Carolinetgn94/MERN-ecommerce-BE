@@ -87,6 +87,21 @@ async function loginShop(req, res, next) {
     }
   }
 
+  async function logoutShop(req, res, next) {
+    try {
+      res.cookie("seller_token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+      res.status(201).json({
+        success: true,
+        message: "Log out successful!",
+      });
+    } catch (err) {
+      return next(new ErrorHandler(err.message, 500));
+    }
+  }
+
 
 module.exports = {
     createShop,
