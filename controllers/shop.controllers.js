@@ -107,4 +107,5 @@ module.exports = {
     createShop,
     loginShop,
     getShop,
+    logoutShop,
 }
