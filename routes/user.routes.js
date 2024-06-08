@@ -15,4 +15,7 @@ router.get('/logout', catchAsyncError(userCtrl.logoutUser))
 
 router.put('/update-user-info', isAuthenticated, catchAsyncError(userCtrl.updateUserInfo));
 
+router.put('/update-avatar', isAuthenticated, upload.single("image"), catchAsyncError(userCtrl.updateUserAvatar));
+
+
 module.exports = router;

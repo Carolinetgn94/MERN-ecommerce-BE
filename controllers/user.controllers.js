@@ -167,10 +167,35 @@ async function updateUserInfo (req, res, next) {
 }
 
 
+async function updateUserAvatar (req, res, next) {
+  try {
+    const existsUser = await User.findById(req.user.id);
+
+    const existAvatarPath = `uploads/${existsUser.avatar}`;
+
+    fs.unlinkSync(existAvatarPath);
+
+    const fileUrl = path.join(req.file.filename); 
+
+    const user = await User.findByIdAndUpdate(req.user.id, {avatar: fileUrl});
+
+    res.status(200).json({
+      success: true,
+      user,
+    })
+
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+}
+
+
+
 module.exports = {
   createUser,
   loginUser,
   getUser,
   logoutUser,
   updateUserInfo,
+  updateUserAvatar,
 };
