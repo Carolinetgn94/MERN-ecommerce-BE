@@ -13,4 +13,6 @@ router.get('/getuser', isAuthenticated, catchAsyncError(userCtrl.getUser));
 
 router.get('/logout', catchAsyncError(userCtrl.logoutUser))
 
+router.put('/update-user-info', isAuthenticated, catchAsyncError(userCtrl.updateUserInfo));
+
 module.exports = router;
