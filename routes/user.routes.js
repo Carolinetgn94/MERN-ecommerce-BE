@@ -17,5 +17,6 @@ router.put('/update-user-info', isAuthenticated, catchAsyncError(userCtrl.update
 
 router.put('/update-avatar', isAuthenticated, upload.single("image"), catchAsyncError(userCtrl.updateUserAvatar));
 
+router.put('/update-user-addresses', isAuthenticated, catchAsyncError(userCtrl.updateUserAddress));
 
 module.exports = router;
