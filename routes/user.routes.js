@@ -19,4 +19,9 @@ router.put('/update-avatar', isAuthenticated, upload.single("image"), catchAsync
 
 router.put('/update-user-addresses', isAuthenticated, catchAsyncError(userCtrl.updateUserAddress));
 
+router.delete('/delete-user-address/:id', isAuthenticated, catchAsyncError(userCtrl.deleteUserAddress));
+
+router.put('/update-user-password', isAuthenticated, catchAsyncError(userCtrl.updateUserPassword));
+
+
 module.exports = router;

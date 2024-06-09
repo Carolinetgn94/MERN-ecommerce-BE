@@ -217,6 +217,56 @@ async function updateUserAddress(req, res, next) {
   }
 }
 
+async function deleteUserAddress(req, res, next) {
+  try {
+    const userId = req.user._id;
+    const addressId = req.params.id;
+
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      { $pull: { addresses: { _id: addressId } } }
+    );
+
+    const user = await User.findById(userId);
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+}
+
+async function updateUserPassword(req, res, next) {
+  try {
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isPasswordMatched = await user.comparePassword(
+      req.body.oldPassword
+    );
+
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Old password is incorrect!", 400));
+    }
+
+    if (req.body.newPassword !== req.body.confirmPassword) {
+      return next(
+        new ErrorHandler("Password doesn't matched with each other!", 400)
+      );
+    }
+    user.password = req.body.newPassword;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully!",
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+}
+
 module.exports = {
   createUser,
   loginUser,
@@ -225,4 +275,6 @@ module.exports = {
   updateUserInfo,
   updateUserAvatar,
   updateUserAddress,
+  deleteUserAddress,
+  updateUserPassword,
 };
