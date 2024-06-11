@@ -112,11 +112,40 @@ async function loginShop(req, res, next) {
   
       const fileUrl = path.join(req.file.filename);
   
-      const user = await Shop.findByIdAndUpdate(req.seller._id, { avatar: fileUrl });
+      const seller = await Shop.findByIdAndUpdate(req.seller._id, { avatar: fileUrl });
   
       res.status(200).json({
         success: true,
-        user,
+        seller,
+      });
+
+    } catch (err) {
+      return next(new ErrorHandler(err.message, 500));
+    }
+  }
+
+
+  async function updateSellerInfo (req, res, next) {
+    try {
+      const { name, description , address, phoneNumber, postalCode} = req.body;
+
+      const shop = await Shop.findOne(req.seller._id);
+  
+      if (!shop) {
+        return next(new ErrorHandler("User not found", 400));
+      }
+  
+      shop.name = name;
+      shop.description = description;
+      shop.address = address;
+      shop.phoneNumber = phoneNumber;
+      shop.postalCode = postalCode;
+  
+      await shop.save();
+  
+      res.status(201).json({
+        success: true,
+        shop,
       });
 
     } catch (err) {
@@ -131,4 +160,5 @@ module.exports = {
     getShop,
     logoutShop,
     updateShopAvatar,
+    updateSellerInfo,
 }
