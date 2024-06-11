@@ -13,4 +13,7 @@ router.get('/getshop', isSeller, catchAsyncError(shopCtrl.getShop));
 
 router.get('/logout', catchAsyncError(shopCtrl.logoutShop))
 
+router.put('/update-shop-avatar', isSeller, upload.single("image"), catchAsyncError(shopCtrl.updateShopAvatar));
+
+
 module.exports = router;

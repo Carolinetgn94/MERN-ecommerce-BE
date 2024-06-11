@@ -102,10 +102,33 @@ async function loginShop(req, res, next) {
     }
   }
 
+  async function updateShopAvatar (req, res, next) {
+    try {
+      const existsUser = await Shop.findById(req.seller._id);
+
+      const existAvatarPath = `uploads/${existsUser.avatar}`;
+  
+      fs.unlinkSync(existAvatarPath);
+  
+      const fileUrl = path.join(req.file.filename);
+  
+      const user = await Shop.findByIdAndUpdate(req.seller._id, { avatar: fileUrl });
+  
+      res.status(200).json({
+        success: true,
+        user,
+      });
+
+    } catch (err) {
+      return next(new ErrorHandler(err.message, 500));
+    }
+  }
+
 
 module.exports = {
     createShop,
     loginShop,
     getShop,
     logoutShop,
+    updateShopAvatar,
 }
