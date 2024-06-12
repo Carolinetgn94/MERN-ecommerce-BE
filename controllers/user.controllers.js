@@ -133,19 +133,27 @@ async function updateUserInfo(req, res, next) {
 
 async function updateUserAvatar(req, res, next) {
   try {
-    const existsUser = await User.findById(req.user.id);
+    let existsUser = await User.findById(req.user.id);
+    if (req.file) {
+      const imageId = existsUser.avatar.public_id;
 
-    const existAvatarPath = `uploads/${existsUser.avatar}`;
+      await cloudinary.uploader.destroy(imageId);
 
-    fs.unlinkSync(existAvatarPath);
+      const myCloud = await cloudinary.uploader.upload(req.file.path, {
+        folder: "avatars",
+      });
 
-    const fileUrl = path.join(req.file.filename);
+      existsUser.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    }
 
-    const user = await User.findByIdAndUpdate(req.user.id, { avatar: fileUrl });
+    await existsUser.save();
 
     res.status(200).json({
       success: true,
-      user,
+      user: existsUser,
     });
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
