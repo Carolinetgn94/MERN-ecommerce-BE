@@ -14,7 +14,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use("/", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
@@ -31,7 +31,7 @@ app.use("/api/product", productRoute)
 
 app.use(ErrorHandler);
 
-const PORT = 4000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, function () {
   console.log(`Express app is running on port ${PORT}`);

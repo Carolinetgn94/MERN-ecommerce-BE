@@ -2,6 +2,7 @@ class ErrorHandler extends Error{
     constructor(message,statusCode){
         super(message);
         this.statusCode = statusCode
+        console.log('ErrorHandler constructor called with:', message, statusCode);
 
         Error.captureStackTrace(this,this.constructor);
 
