@@ -1,9 +1,10 @@
 const express = require('express');
-const upload = require('../multer');
 const router = express.Router();
 const productCtrl = require("../controllers/product.controllers");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const { isSeller } = require('../middleware/auth');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 
 router.post('/create-product', upload.array("images"), catchAsyncError(productCtrl.createProduct));
