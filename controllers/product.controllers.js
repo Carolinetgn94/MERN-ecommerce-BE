@@ -6,7 +6,7 @@ const cloudinary = require("../Cloudinary/cloudinary.config")
 
 
 async function createProduct(req, res, next) {
-  try {
+   try {
     const shopId = req.body.shopId;
     const shop = await Shop.findById(shopId);
 
@@ -25,8 +25,7 @@ async function createProduct(req, res, next) {
         const result = await cloudinary.uploader.upload(file.path, {
           folder: 'products',
         });
-      
-        // await fs.unlink(file.path).catch(err => console.error(`Failed to delete file: ${file.path}`, err));
+
         return result.secure_url;
       })
     );
@@ -37,9 +36,41 @@ async function createProduct(req, res, next) {
 
     const product = await Product.create(productData);
 
+    if (!product) {
+      files.forEach((file) => {
+        fs.unlink(file.path, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Error deleting file:', unlinkErr);
+          }
+        });
+      });
+      return next(new ErrorHandler("Failed to create product", 500));
+    }
+
     res.status(201).json({
       success: true,
       product,
+    });
+  } catch (err) {
+
+    files.forEach((file) => {
+      fs.unlink(file.path, (unlinkErr) => {
+        if (unlinkErr) {
+          console.error('Error deleting file:', unlinkErr);
+        }
+      });
+    });
+    return next(new ErrorHandler(err.message, 400));
+  }
+}
+
+async function getAllShopProducts(req, res, next) {
+  try {
+    const products = await Product.find({ shopId: req.params.id });
+
+    res.status(200).json({
+      success: true,
+      products,
     });
   } catch (err) {
     return next(new ErrorHandler(err.message, 400));

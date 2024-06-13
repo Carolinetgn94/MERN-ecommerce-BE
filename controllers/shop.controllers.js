@@ -6,48 +6,46 @@ const Shop = require("../models/shop.models");
 const sendShopToken = require("../utilities/shopToken");
 
 async function createShop (req, res, next) {
-    try {
-        const {email} = req.body;
-        const sellerEmail = await Shop.findOne({email});
-        if (sellerEmail) {
-            const filename = req.file.filename;
-            const filePath = `uploads/${filename}`
-            fs.unlink (filePath, (err) => {
-              if(err) {
-                console.log(err);
-                res.status(500).json({message: "Error deleting file"})
-              } else {
-                res.json({message: "File deleted"})
-              }
-            })
-              return next(new ErrorHandler("User already exists", 400));
-          }
-          const file = req.file;
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'shop-avatars',
-          });
-          const avatarUrl = result.secure_url;
+  try {
+    const { email } = req.body;
+    const sellerEmail = await Shop.findOne({ email });
 
-        const seller = {
-            name: req.body.name,
-            email: email,
-            password: req.body.password,
-            avatar: avatarUrl,
-            address: req.body.address,
-            phoneNumber: req.body.phoneNumber,
-            postalCode: req.body.postalCode,
-        };
-
-        const newSeller = await Shop.create(seller);
-        res.status(201).json({
-          success: true,
-          newSeller,
-        })
-        console.log(seller);
-
-    } catch (err) {
-        return next (new ErrorHandler(err.message, 400));
+    if (sellerEmail) {
+      const filename = req.file.filename;
+      const filePath = `uploads/${filename}`;
+      await fs.promises.unlink(filePath);
+      return res.status(400).json({ message: "User already exists" });
     }
+
+    const file = req.file;
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: 'shop-avatars',
+    });
+    const avatarUrl = result.secure_url;
+
+    const seller = {
+      name: req.body.name,
+      email: email,
+      password: req.body.password,
+      avatar: avatarUrl,
+      address: req.body.address,
+      phoneNumber: req.body.phoneNumber,
+      postalCode: req.body.postalCode,
+    };
+
+    const newSeller = await Shop.create(seller);
+    res.status(201).json({
+      success: true,
+      newSeller,
+    });
+
+    await fs.promises.unlink(file.path);
+  } catch (err) {
+    if (req.file) {
+      await fs.promises.unlink(req.file.path);
+    }
+    res.status(500).json({ message: err.message });
+  }
 }
 
 async function loginShop(req, res, next) {
@@ -107,7 +105,7 @@ async function loginShop(req, res, next) {
   async function updateShopAvatar (req, res, next) {
     try {
       if (!req.file) {
-        return next(new ErrorHandler("No file uploaded", 400));
+        return res.status(400).json({ message: "No file uploaded" });
       }
   
       const file = req.file;
@@ -117,9 +115,8 @@ async function loginShop(req, res, next) {
       const avatarUrl = result.secure_url;
   
       const seller = await Shop.findByIdAndUpdate(req.seller._id, { avatar: avatarUrl }, { new: true });
-  
       if (!seller) {
-        return next(new ErrorHandler("Seller not found", 404));
+        return res.status(404).json({ message: "Seller not found" });
       }
   
       res.status(200).json({
@@ -128,9 +125,12 @@ async function loginShop(req, res, next) {
         avatarUrl,
       });
   
-
+      await fs.promises.unlink(file.path);
     } catch (err) {
-      return next(new ErrorHandler(err.message, 500));
+      if (req.file) {
+        await fs.promises.unlink(req.file.path);
+      }
+      res.status(500).json({ message: err.message });
     }
   }
 
