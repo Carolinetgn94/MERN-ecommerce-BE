@@ -13,7 +13,7 @@ router.get('/getshop', isSeller, catchAsyncError(shopCtrl.getShop));
 
 router.get('/logout', catchAsyncError(shopCtrl.logoutShop))
 
-router.put('/update-shop-avatar', isSeller, upload.single("image"), catchAsyncError(shopCtrl.updateShopAvatar));
+router.put('/update-shop-avatar', isSeller, upload.single("file"), catchAsyncError(shopCtrl.updateShopAvatar));
 
 router.put('/update-seller-info', isSeller, catchAsyncError(shopCtrl.updateSellerInfo));
 

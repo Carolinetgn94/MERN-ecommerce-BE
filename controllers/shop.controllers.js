@@ -1,5 +1,5 @@
 const ErrorHandler = require("../utilities/ErrorHandler");
-const cloudinary = require("cloudinary");
+const cloudinary = require("../Cloudinary/cloudinary.config");
 const path = require("path");
 const fs = require("fs");
 const Shop = require("../models/shop.models");
@@ -22,15 +22,17 @@ async function createShop (req, res, next) {
             })
               return next(new ErrorHandler("User already exists", 400));
           }
-          const filename = req.file.filename;
-        const fileUrl = path.join(filename);
-
+          const file = req.file;
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'shop-avatars',
+          });
+          const avatarUrl = result.secure_url;
 
         const seller = {
             name: req.body.name,
             email: email,
             password: req.body.password,
-            avatar: fileUrl,
+            avatar: avatarUrl,
             address: req.body.address,
             phoneNumber: req.body.phoneNumber,
             postalCode: req.body.postalCode,
@@ -104,20 +106,28 @@ async function loginShop(req, res, next) {
 
   async function updateShopAvatar (req, res, next) {
     try {
-      const existsUser = await Shop.findById(req.seller._id);
-
-      const existAvatarPath = `uploads/${existsUser.avatar}`;
+      if (!req.file) {
+        return next(new ErrorHandler("No file uploaded", 400));
+      }
   
-      fs.unlinkSync(existAvatarPath);
+      const file = req.file;
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'shop-avatars',
+      });
+      const avatarUrl = result.secure_url;
   
-      const fileUrl = path.join(req.file.filename);
+      const seller = await Shop.findByIdAndUpdate(req.seller._id, { avatar: avatarUrl }, { new: true });
   
-      const seller = await Shop.findByIdAndUpdate(req.seller._id, { avatar: fileUrl });
+      if (!seller) {
+        return next(new ErrorHandler("Seller not found", 404));
+      }
   
       res.status(200).json({
         success: true,
-        seller,
+        message: "Avatar updated successfully",
+        avatarUrl,
       });
+  
 
     } catch (err) {
       return next(new ErrorHandler(err.message, 500));
