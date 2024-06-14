@@ -140,9 +140,87 @@ async function getAllProducts(req, res, next) {
 
 }
 
+async function getProductDetails(req, res, next) {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: "Failed to fetch product details",
+    });
+  }
+}
+
+async function editProduct(req, res, next) {
+  try {
+    const { name, description, category, price } = req.body;
+    const productId = req.params.id;
+
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const images = product.images || [];
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: 'products',
+        });
+        images.push(result.secure_url);
+        fs.unlinkSync(file.path);
+      }
+    }
+
+
+    product.name = name;
+    product.description = description;
+    product.category = category;
+    product.price = price;
+    product.images = images;
+
+
+    await product.save();
+
+ 
+    res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (err) {
+
+    console.error(err.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update product",
+    });
+  }
+}
+
 module.exports = {
   createProduct,
   getAllShopProducts,
   deleteShopProduct,
   getAllProducts,
+  getProductDetails,
+  editProduct,
 }

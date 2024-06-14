@@ -15,5 +15,9 @@ router.delete('/delete-shop-product/:id', isSeller, catchAsyncError(productCtrl.
 
 router.get('/get-all-products', catchAsyncError(productCtrl.getAllProducts));
 
+router.get('/get-product-details/:id', catchAsyncError(productCtrl.getProductDetails));
+
+router.put('/edit-product/:id', upload.array("images"), catchAsyncError(productCtrl.editProduct));
+
 
 module.exports = router;
