@@ -216,6 +216,21 @@ async function editProduct(req, res, next) {
   }
 }
 
+async function getAllProductsByCategory(req, res, next) {
+  try {
+    const category = req.params.category;
+    const products = await Product.find({ category: category }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (err) {
+    return next(new ErrorHandler(err.message, 400));
+  }
+}
+
+
 module.exports = {
   createProduct,
   getAllShopProducts,
@@ -223,4 +238,5 @@ module.exports = {
   getAllProducts,
   getProductDetails,
   editProduct,
+  getAllProductsByCategory,
 }

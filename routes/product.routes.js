@@ -19,5 +19,6 @@ router.get('/get-product-details/:id', catchAsyncError(productCtrl.getProductDet
 
 router.put('/edit-product/:id', upload.array("images"), catchAsyncError(productCtrl.editProduct));
 
+router.get('/get-all-products-by-category/:category', catchAsyncError(productCtrl.getAllProductsByCategory));
 
 module.exports = router;
