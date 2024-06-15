@@ -80,7 +80,7 @@ async function getAllShopProducts(req, res, next) {
 
 async function getAllShopProducts(req, res, next) {
     try {
-        const products = await Product.find({shopId: req.params.id});
+        const products = await Product.find({shopId: req.params.id}).populate('shopId', 'name avatar');;
 
         res.status(201).json({
             success: true,
@@ -128,8 +128,9 @@ async function deleteShopProduct(req, res, next) {
 
 async function getAllProducts(req, res, next) {
     try {
-        const products = await Product.find().sort({ createdAt: -1 });
-  
+        // const products = await Product.find().sort({ createdAt: -1 });
+        const products = await Product.find().populate('shopId');
+
         res.status(201).json({
           success: true,
           products,
