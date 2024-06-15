@@ -6,7 +6,7 @@ const cloudinary = require("../Cloudinary/cloudinary.config")
 
 
 async function createProduct(req, res, next) {
-   try {
+  try {
     const shopId = req.body.shopId;
     const shop = await Shop.findById(shopId);
 
@@ -26,6 +26,12 @@ async function createProduct(req, res, next) {
           folder: 'products',
         });
 
+        fs.unlink(file.path, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Error deleting file:', unlinkErr);
+          }
+        });
+
         return result.secure_url;
       })
     );
@@ -37,13 +43,6 @@ async function createProduct(req, res, next) {
     const product = await Product.create(productData);
 
     if (!product) {
-      files.forEach((file) => {
-        fs.unlink(file.path, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error('Error deleting file:', unlinkErr);
-          }
-        });
-      });
       return next(new ErrorHandler("Failed to create product", 500));
     }
 
@@ -53,16 +52,20 @@ async function createProduct(req, res, next) {
     });
   } catch (err) {
 
-    files.forEach((file) => {
-      fs.unlink(file.path, (unlinkErr) => {
-        if (unlinkErr) {
-          console.error('Error deleting file:', unlinkErr);
-        }
+    if (req.files) {
+      req.files.forEach((file) => {
+        fs.unlink(file.path, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Error deleting file:', unlinkErr);
+          }
+        });
       });
-    });
+    }
+
     return next(new ErrorHandler(err.message, 400));
   }
 }
+
 
 async function getAllShopProducts(req, res, next) {
   try {
