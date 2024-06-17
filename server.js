@@ -10,7 +10,9 @@ require("./config/database");
 const app = express();
 app.use(
   cors({
-    origin: "https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app",
+    origin: "http://localhost:3000",
+    //"https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app"
+    //"http://localhost:3000/""
     credentials: true,
   })
 );

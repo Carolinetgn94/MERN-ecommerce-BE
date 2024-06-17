@@ -141,13 +141,17 @@ async function updateUserAvatar(req, res, next) {
 
       const myCloud = await cloudinary.uploader.upload(req.file.path, {
         folder: "avatars",
+        public_id: imageId,
       });
+      
 
       existsUser.avatar = {
         public_id: myCloud.public_id,
         url: myCloud.secure_url,
       };
     }
+
+    fs.unlinkSync(req.file.path);
 
     await existsUser.save();
 

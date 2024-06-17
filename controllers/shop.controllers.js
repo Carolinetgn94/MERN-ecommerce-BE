@@ -109,8 +109,10 @@ async function loginShop(req, res, next) {
       }
   
       const file = req.file;
+      const publicId = req.file.filename;
       const result = await cloudinary.uploader.upload(file.path, {
         folder: 'shop-avatars',
+        public_id: publicId, 
       });
       const avatarUrl = result.secure_url;
   
