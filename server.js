@@ -33,7 +33,7 @@ app.use("/api/order", orderRoute);
 
 app.use(ErrorHandler);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, function () {
   console.log(`Express app is running on port ${PORT}`);
