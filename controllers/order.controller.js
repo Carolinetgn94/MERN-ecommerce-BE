@@ -33,6 +33,7 @@ async function createOrder(req, res) {
       );
       return {
         product: item._id,
+        shop: productDetail.shopId,
         name: productDetail.name,
         image: productDetail.images[0],
         quantity: item.qty,
@@ -79,26 +80,74 @@ async function getUserOrders(req, res) {
 }
 
 async function getShopOrders(req, res) {
-  try {
-    const products = await Product.find({ shopId: req.user._id });
-    const productIds = products.map((product) => product._id);
-
-    const orders = await Order.find({
-      "products.product": { $in: productIds },
-    })
-      .populate("user")
-      .populate("products.product");
-
-    res.status(200).json({
-      success: true,
-      orders,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+    try {
+        const shopId = req.seller._id;
+    
+        const orders = await Order.aggregate([
+          {
+            $lookup: {
+              from: "products",
+              localField: "products.product",
+              foreignField: "_id",
+              as: "productDetails",
+            },
+          },
+          {
+            $match: {
+              $expr: {
+                $in: [shopId, "$productDetails.shopId"],
+              },
+            },
+          },
+          {
+            $project: {
+              user: 1,
+              shippingAddress: 1,
+              totalPrice: 1,
+              paymentMethod: 1,
+              products: {
+                $map: {
+                  input: "$products",
+                  as: "product",
+                  in: {
+                    $mergeObjects: [
+                      "$$product",
+                      {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: "$productDetails",
+                              cond: {
+                                $eq: ["$$this._id", "$$product.product"],
+                              },
+                            },
+                          },
+                          0,
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+              createdAt: 1,
+              isPaid: 1,
+              paidAt: 1,
+              isDelivered: 1,
+              deliveredAt: 1,
+            },
+          },
+        ]);
+    
+        res.status(200).json({
+          success: true,
+          orders,
+        });
+      } catch (error) {
+        res.status(400).json({
+          success: false,
+          message: error.message,
+        });
+      }
 }
 
 module.exports = {
