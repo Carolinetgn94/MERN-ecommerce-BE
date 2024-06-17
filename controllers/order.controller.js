@@ -1,12 +1,14 @@
 const Order = require("../models/order.models");
-const Product = require("../models/product.models")
+const Product = require("../models/product.models");
 const mongoose = require("mongoose");
 
 async function createOrder(req, res) {
   try {
     const { shippingAddress, totalPrice, cart, paymentMethod } = req.body;
 
-    const validProductIds = cart.every(item => mongoose.Types.ObjectId.isValid(item._id));
+    const validProductIds = cart.every((item) =>
+      mongoose.Types.ObjectId.isValid(item._id)
+    );
     if (!validProductIds) {
       return res.status(400).json({
         success: false,
@@ -14,10 +16,10 @@ async function createOrder(req, res) {
       });
     }
 
-    // Fetch products details from DB
-    const productsDetails = await Product.find({ _id: { $in: cart.map(item => item._id) } });
+    const productsDetails = await Product.find({
+      _id: { $in: cart.map((item) => item._id) },
+    });
 
-    // Check if all products in cart are found in database
     if (productsDetails.length !== cart.length) {
       return res.status(400).json({
         success: false,
@@ -25,15 +27,16 @@ async function createOrder(req, res) {
       });
     }
 
-    // Prepare products array for Order model
-    const products = cart.map(item => {
-      const productDetail = productsDetails.find(p => p._id.toString() === item._id);
+    const products = cart.map((item) => {
+      const productDetail = productsDetails.find(
+        (p) => p._id.toString() === item._id
+      );
       return {
         product: item._id,
         name: productDetail.name,
-        image: productDetail.images[0], // Assuming productDetail.images is an array
+        image: productDetail.images[0],
         quantity: item.qty,
-        price: item.price, 
+        price: item.price,
       };
     });
 
@@ -75,29 +78,28 @@ async function getUserOrders(req, res) {
   }
 }
 
-
 async function getShopOrders(req, res) {
-    try {
-        const products = await Product.find({ shopId: req.user._id });
-        const productIds = products.map(product => product._id);
-    
-        const orders = await Order.find({
-          "products.product": { $in: productIds },
-        }).populate("user").populate("products.product");
-    
-        res.status(200).json({
-          success: true,
-          orders,
-        });
-      } catch (error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-      }
+  try {
+    const products = await Product.find({ shopId: req.user._id });
+    const productIds = products.map((product) => product._id);
+
+    const orders = await Order.find({
+      "products.product": { $in: productIds },
+    })
+      .populate("user")
+      .populate("products.product");
+
+    res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
-
-
 
 module.exports = {
   createOrder,
