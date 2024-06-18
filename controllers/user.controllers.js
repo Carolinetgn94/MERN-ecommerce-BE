@@ -86,8 +86,10 @@ async function getUser(req, res, next) {
 async function logoutUser(req, res, next) {
   try {
     res.cookie("token", null, {
-      expires: new Date(Date.now()),
+      expires: new Date(0),
       httpOnly: true,
+      secure: true,
+      sameSite: 'None',
     });
     res.status(201).json({
       success: true,
