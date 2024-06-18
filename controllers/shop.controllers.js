@@ -92,7 +92,7 @@ async function loginShop(req, res, next) {
       res.cookie("seller_token", null, {
         expires: new Date(0),
         httpOnly: true,
-        secure: true, 
+        secure: process.env.NODE_ENV === "production", 
         sameSite: "None", 
       });
       res.status(201).json({
