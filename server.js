@@ -6,16 +6,29 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 require("./config/database");
 
+// app.use(
+//   cors({
+//     origin: "http://localhost:3000",
+//     //"https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app"
+//     //"http://localhost:3000"
+//     credentials: true,
+//   })$
+// );
+
 
 const app = express();
+
 app.use(
   cors({
-    origin: "https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app",
-    //"https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app"
-    //"http://localhost:3000/""
+    origin: [
+      "https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
   })
 );
+
+
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use("/", express.static("uploads"));
