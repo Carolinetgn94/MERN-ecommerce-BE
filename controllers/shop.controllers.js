@@ -90,8 +90,10 @@ async function loginShop(req, res, next) {
   async function logoutShop(req, res, next) {
     try {
       res.cookie("seller_token", null, {
-        expires: new Date(Date.now()),
+        expires: new Date(0),
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production", 
+        sameSite: "strict", 
       });
       res.status(201).json({
         success: true,
