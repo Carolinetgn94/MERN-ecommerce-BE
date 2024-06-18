@@ -6,24 +6,12 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 require("./config/database");
 
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000",
-//     //"https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app"
-//     //"http://localhost:3000"
-//     credentials: true,
-//   })$
-// );
-
 
 const app = express();
 
 app.use(
   cors({
-    origin: [
-      "https://fe-mern-ecommerce-71wsrxrli-caroline-s-projects-7d2765cf.vercel.app",
-      "http://localhost:3000",
-    ],
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
